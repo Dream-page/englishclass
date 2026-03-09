@@ -6,8 +6,10 @@
     <title>English Class Screen</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Noto Sans KR Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts: Noto Sans KR (기본), Gowun Batang (바탕체), Nanum Pen Script (펜글씨), Hi Melody (귀여운체) -->
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Hi+Melody&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -86,7 +88,7 @@
             color: #D1D5DB;
             font-size: 1.2rem;
             transition: color 0.2s;
-            z-index: 10;
+            z-index: 50; /* Z-index 높임 */
         }
         .close-btn:hover { color: #EF4444; }
 
@@ -250,7 +252,7 @@
 
         /* --- English Note Widget --- */
         #widget-note { 
-            min-width: 600px; 
+            min-width: 650px; 
             min-height: 350px; 
         }
         #widget-note .widget-content {
@@ -324,8 +326,10 @@
             min-height: 100px;
             border: none;
             outline: none;
-            /* 폰트 적용 */
-            font-family: 'LetsTraceRuled', 'Comic Sans MS', cursive, sans-serif;
+            /* 우선순위 1: LetsTraceRuled (영어/숫자 4선지 적용)
+               우선순위 2: Noto Sans KR (한글 적용 기본값)
+            */
+            font-family: 'LetsTraceRuled', 'Noto Sans KR', sans-serif;
             font-size: 80px; 
             line-height: 1.2;
             color: #1f2937;
@@ -339,6 +343,19 @@
             color: #9ca3af;
             pointer-events: none;
             display: block;
+        }
+
+        /* --- Dictionary Widget --- */
+        #widget-dict {
+            min-width: 400px;
+            min-height: 500px;
+            width: 450px;
+            height: 600px;
+        }
+        #widget-dict .widget-content {
+            padding: 0;
+            align-items: stretch;
+            justify-content: stretch;
         }
 
         /* --- Bottom Toolbar --- */
@@ -605,7 +622,7 @@
     </div>
 
     <!-- 4. English Note Widget -->
-    <div id="widget-note" class="widget" style="top: 300px; left: 100px; display: none;">
+    <div id="widget-note" class="widget" style="top: 350px; left: 50px; display: none;">
         <div class="widget-header"><i class="fas fa-grip-lines"></i></div>
         <div class="widget-content">
             <i class="fas fa-times close-btn" onclick="toggleWidget('widget-note', 'btn-note')"></i>
@@ -620,9 +637,16 @@
                     <button class="color-btn" style="background-color: #ef4444;" onclick="changeTextColor('#ef4444')" title="빨간색"></button>
                     <button class="color-btn" style="background-color: #3b82f6;" onclick="changeTextColor('#3b82f6')" title="파란색"></button>
                 </div>
+                
+                <!-- 한글 폰트 선택기 추가 -->
+                <select class="note-btn ml-3" style="font-weight: 500;" onchange="changeKoreanFont(this.value)" title="한글 글씨체 변경 (영어는 4선지 고정)">
+                    <option value="Noto Sans KR">한글: 기본 고딕체</option>
+                    <option value="Gowun Batang">한글: 단정한 바탕체</option>
+                    <option value="Nanum Pen Script">한글: 펜글씨체</option>
+                    <option value="Hi Melody">한글: 동글 귀여운체</option>
+                </select>
 
                 <button class="note-btn ml-3" onclick="clearNote()" title="전체 지우기"><i class="fas fa-eraser"></i></button>
-                <!-- 안내 문구 수정 -->
                 <span class="note-info"><i class="fas fa-info-circle"></i> </span>
             </div>
 
@@ -630,6 +654,23 @@
                 <!-- textarea 대신 색상 및 서식이 적용되는 contenteditable 영역 사용 -->
                 <div id="english-note-input" contenteditable="true" spellcheck="false" placeholder=" Type your English sentence here..."></div>
             </div>
+        </div>
+    </div>
+
+    <!-- 5. Dictionary Widget -->
+    <div id="widget-dict" class="widget" style="top: 150px; left: 700px; display: none;">
+        <div class="widget-header"><i class="fas fa-grip-lines"></i></div>
+        <div class="widget-content">
+            <i class="fas fa-times close-btn" onclick="toggleWidget('widget-dict', 'btn-dict')" style="background: rgba(255,255,255,0.9); border-radius: 50%; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; top: 10px; right: 10px;"></i>
+            
+            <!-- 네이버 사전 외부 링크 열기 버튼 (iframe 차단 대비용) -->
+            <div style="position: absolute; top: 10px; left: 15px; z-index: 10;">
+                <button onclick="window.open('https://en.dict.naver.com/#/main', 'naverDict', 'width=500,height=700');" class="bg-white border border-gray-300 rounded px-3 py-1 text-xs text-blue-600 hover:bg-gray-100 shadow-sm font-bold" title="네이버 사전 보안 정책으로 화면이 안 보일 경우 새 창으로 열어주세요">
+                    <i class="fas fa-external-link-alt"></i> 새 창으로 열기
+                </button>
+            </div>
+
+            <iframe src="https://en.dict.naver.com/#/main" class="w-full h-full border-none flex-grow" title="네이버 영어사전"></iframe>
         </div>
     </div>
 
@@ -652,6 +693,10 @@
             <button id="btn-note" class="tool-btn" onclick="toggleWidget('widget-note', 'btn-note')">
                 <i class="fas fa-book-open"></i>
                 <span>영어노트</span>
+            </button>
+            <button id="btn-dict" class="tool-btn" onclick="toggleWidget('widget-dict', 'btn-dict')">
+                <i class="fas fa-book"></i>
+                <span>사전</span>
             </button>
         </div>
         
@@ -990,6 +1035,13 @@
             document.getElementById('english-note-input').focus();
         }
 
+        function changeKoreanFont(fontName) {
+            const noteInput = document.getElementById('english-note-input');
+            // 영어는 LetsTraceRuled로 고정하고, 그 폰트에 없는 글자(한글)에 대해서만 선택한 폰트를 적용합니다.
+            noteInput.style.fontFamily = `'LetsTraceRuled', '${fontName}', sans-serif`;
+            noteInput.focus();
+        }
+
         function clearNote() {
             // contenteditable div 내용 초기화
             document.getElementById('english-note-input').innerHTML = '';
@@ -1047,7 +1099,7 @@
                 }
             });
 
-            // 초기 실행 시 시계와 영어 노트를 켜줍니다
+            // 초기 실행 시 기본 위젯 켜기
             toggleWidget('widget-clock', 'btn-clock');
             toggleWidget('widget-note', 'btn-note');
         };
