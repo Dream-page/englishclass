@@ -21,6 +21,8 @@
             src: local('LetsTraceRuled'), 
                  local('Lets Trace ruled'), 
                  url('letstrace.s-trace-ruled.otf') format('opentype');
+            /* ★ 한글과의 크기 밸런스를 맞추기 위해 영어 폰트만 2배 확대 ★ */
+            size-adjust: 200%; 
         }
 
         body {
@@ -345,8 +347,15 @@
                우선순위 2: Noto Sans KR (한글 적용 기본값)
             */
             font-family: 'LetsTraceRuled', 'Noto Sans KR', sans-serif;
-            font-size: 80px; 
-            line-height: 1.2;
+            
+            /* ★ 핵심 변경 사항 ★
+               - 영어 크기를 size-adjust: 200%로 키웠기 때문에, 기본 폰트 크기를 절반인 40px로 줄입니다.
+               - 한글은 40px로 렌더링되고, 영어 4선지는 80px(40*200%)로 렌더링되어 크기 비율이 완벽하게 맞게 됩니다. 
+            */
+            font-size: 40px; 
+            /* 줄 간격을 1.2배에서 2.4배로 늘려 기존 4선지의 상하 간격을 그대로 유지시킵니다. */
+            line-height: 2.4; 
+            
             color: #1f2937;
             background: transparent;
             white-space: pre-wrap;
@@ -643,8 +652,9 @@
             <i class="fas fa-times close-btn" onclick="toggleWidget('widget-note', 'btn-note')"></i>
             
             <div class="note-toolbar">
-                <button class="note-btn" onclick="changeNoteFontSize(10)" title="글자 크게"><i class="fas fa-search-plus"></i></button>
-                <button class="note-btn" onclick="changeNoteFontSize(-10)" title="글자 작게"><i class="fas fa-search-minus"></i></button>
+                <!-- 확대/축소 배율을 10 -> 5로 수정 (기본 폰트 사이즈가 절반이 되었기 때문) -->
+                <button class="note-btn" onclick="changeNoteFontSize(5)" title="글자 크게"><i class="fas fa-search-plus"></i></button>
+                <button class="note-btn" onclick="changeNoteFontSize(-5)" title="글자 작게"><i class="fas fa-search-minus"></i></button>
                 
                 <!-- 텍스트 색상 변경 도구 -->
                 <div class="color-picker-group">
@@ -667,7 +677,7 @@
                 <button class="note-btn" id="btn-maximize-note" onclick="toggleMaximizeNote()" title="전체화면/복원"><i class="fas fa-expand"></i></button>
 
                 <!-- 안내 문구 (우측으로 밀림) -->
-                <span class="note-info"><i class="fas fa-info-circle"></i></span>
+                <span class="note-info"><i class="fas fa-info-circle"></i> </span>
             </div>
 
             <div class="note-input-container">
@@ -1036,12 +1046,13 @@
         // ==========================================
         // 7. English Note Logic (크기/색상 제어 및 공백 처리 추가)
         // ==========================================
-        let currentNoteFontSize = 80;
+        let currentNoteFontSize = 40; // 한글 폰트 크기 기본값 (영어 폰트는 size-adjust로 인해 80px로 보임)
 
         function changeNoteFontSize(delta) {
             currentNoteFontSize += delta;
-            if (currentNoteFontSize < 30) currentNoteFontSize = 30;
-            if (currentNoteFontSize > 200) currentNoteFontSize = 200;
+            // 한글 크기 제한 (15px ~ 100px)
+            if (currentNoteFontSize < 15) currentNoteFontSize = 15;
+            if (currentNoteFontSize > 100) currentNoteFontSize = 100;
             
             const noteInput = document.getElementById('english-note-input');
             noteInput.style.fontSize = currentNoteFontSize + 'px';
